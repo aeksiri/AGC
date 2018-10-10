@@ -1,23 +1,21 @@
 <launch>
     <!-- Start ROS communication between the robot's computer and Linorobot base -->
     <node pkg="rosserial_python" name="rosserial_lino" type="serial_node.py" output="screen">
-        <param name="port" value="/dev/denso_agc04" />
+        <param name="port" value="/dev/denso_agc03" />
         <param name="baud" value="57600" />
     </node>
 
     <!-- Start ROS communication between the robot's computer and Mobi_robot I/O -->
-    <node pkg="rosserial_python" name="rosserial_denso_agc04_io" type="serial_node.py" output="screen">
-        <param name="port" value="/dev/denso_agc04_io" />
+    <node pkg="rosserial_python" name="rosserial_denso_agc03_io" type="serial_node.py" output="screen">
+        <param name="port" value="/dev/denso_agc03_io" />
         <param name="baud" value="57600" />
     </node>
-
-    <!-- Start ROS communication between the robot's computer and Mobi_robot I/O -->
-    <!--node pkg="rosserial_python" name="rosserial_denso_agc04_roller" type="serial_node.py" output="screen">
-        <param name="port" value="/dev/denso_agc04_roller" />
+    
+    <!-- Start ROS communication between the robot's computer and Roller -->
+    <node pkg="rosserial_python" name="rosserial_denso_agc03_roller" type="serial_node.py" output="screen">
+        <param name="port" value="/dev/denso_agc03_roller" />
         <param name="baud" value="57600" />
-    </node-->  
-
-
+    </node>
 
     <!-- IMU Relay and Filter -->
     <include file="$(find linorobot)/launch/include/imu/imu.launch" />
@@ -25,31 +23,19 @@
     <!-- Publish Linorobot odometry -->
     <node pkg="linorobot" name="lino_base_node" type="lino_base_node"></node>
 
-    <!-- PID Config -->
-    <!--node pkg="lino_pid" name="lino_pid_node" type="pid_configure"></node-->
+    <!-- Publish static transform from base_footprint to base_link -->
+    <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_base_link" args="0 0 0.0705 0 0 0  /base_footprint /base_link  100"/>
 
+
+    <!-- Publish static transform from base_link to imu_link -->
+    <!-- gyro z=0.24 -->
+    <node pkg="tf" type="static_transform_publisher" name="base_link_to_imu_link" args="0.04 0.0 0.16382 0 0 0  /base_link /imu_link 100"/>
 
     <!-- Publish static transform from base_link to camera_link -->
     <node pkg="tf" type="static_transform_publisher" name="base_link_to_camera_link" args="-0.165 0.0 0.298 3.141 0 0 /base_link /camera_link 100"/>
 
-
-
-    <!-- Publish static transform from base_footprint to base_link -->
-    <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_base_link" args="0 0 0.07 0 0 0  /base_footprint /base_link  100"/>
-
     <!-- Run Linorobot compatible laser drivers -->
     <include file="$(find linorobot)/launch/include/laser.launch" />
 
-    <!-- Run Openni_launch openni.launch -->
-    <include file="$(find openni_launch)/launch/openni.launch" />
-
-    <!-- Run rbx2_ar_tags ar_indiv_kinect.launch -->
-    <include file="$(find rbx2_ar_tags)/launch/ar_indiv_kinect.launch" />
-
-    <!-- Run rbx2_ar_tags ar_tag_cog.launch -->
-    <include file="$(find rbx2_ar_tags)/launch/ar_tags_id.launch" />
-
-    <!-- Run Linorobot compatible laser drivers -->
-    <include file="$(find linorobot)/launch/navigate.launch" />
 
 </launch>
